@@ -1,0 +1,54 @@
+#include <WiFi.h>
+#include <HTTPClient.h> 
+#include <Arduino_JSON.h>
+
+const char* ssid = "BoomDesign";
+const char* password =  "tree1234";
+
+void setup() {
+
+  Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+
+  Serial.println("Connected to the WiFi network");
+  Serial.println(WiFi.localIP());
+
+}
+
+void loop() {
+
+  if(WiFi.status()== WL_CONNECTED){   //Check WiFi connection status
+  
+   HTTPClient http;
+  
+   http.begin("http://192.168.8.112:5000/put/8/"); 
+   http.addHeader("Content-Type","application/json");
+   int httpResponseCode = http.PUT("{\"wifi\": false, \"battery\": 23,\"aanuit\": false, \"afpaktimer\": 80,\"dribbeltimer\": 136,\"id\": 8,\"passkracht\": 4,\"schietkracht\": 6,\"title\": \"Hans Klazan\"}");   //Send PUT request
+   
+  if (httpResponseCode>0) {
+    //String payload = http.getString();
+    //Serial.println(payload);
+    Serial.println(httpResponseCode);
+  }
+  else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
+  }
+
+   http.end();  //Free resources
+
+ }else{
+
+    Serial.println("Error in WiFi connection");   
+
+ }
+
+  delay(10000);  //Send a request every 10 seconds
+
+}
